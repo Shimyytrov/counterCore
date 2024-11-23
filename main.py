@@ -64,7 +64,7 @@ mouse_pos = (0, 0)
 tick = 0
 temperature = 0.00
 speed = 0
-powerLevel = 0
+powerLevel = 1
 started = False
 itemTutorial = False
 score = 0
@@ -213,7 +213,7 @@ while True:
 
         if nextEvent <= tick <= (nextEvent+250): # Show Event Alert
             eventAlert = font.render(eventMsg, True, (255, 255, 255))
-            eventAlertRect = eventAlert.get_rect(center = (width/2, height/1.3))
+            eventAlertRect = eventAlert.get_rect(center = (width/2, height/1.1))
             screen.blit(eventAlert, eventAlertRect)
 
         if tick == nextEvent:
