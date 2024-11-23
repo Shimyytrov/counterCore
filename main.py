@@ -257,6 +257,8 @@ while True:
             started = True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
             temperature = 100304103
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+            powerLevel = 500
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = event.pos
 
