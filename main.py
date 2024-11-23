@@ -12,6 +12,7 @@ screen = pygame.display.set_mode((width, height))   # full screen
 # load fonts
 font = pygame.font.Font('./assets/fonts/courier.ttf', 48)
 fontBig = pygame.font.Font('./assets/fonts/mindustry.ttf', 72)
+fontMindustry = pygame.font.Font('./assets/fonts/mindustry.ttf', 36)
 event = pygame.event.get()
  
 # load sprites
@@ -40,6 +41,9 @@ cryofluidRect = cryofluid.get_rect(center = (width-width/16, (height/8)*3))
 #load sounds
 largeExplosion = pygame.mixer.Sound('./assets/sounds/meltdown.wav')
 endBoom = pygame.mixer.Sound('./assets/sounds/orchestraBoom.wav')
+def play_track(file, loop, fade_ms):    # play track function
+    pygame.mixer.music.load(f'./assets/music/{file}.ogg')
+    pygame.mixer.music.play(loop, fade_ms)
 
 # variables
 mouse_pos = (0, 0)
@@ -97,7 +101,7 @@ while True:
         msgStart = font.render('Press Space to Start', True, (255,255,255)) # Press to Start
         msgStartRect = msgStart.get_rect(center = (width/2, height/1.3))
         screen.blit(msgStart, msgStartRect)
-        title = fontBig.render('The Phobia Title', True, (255,255,255)) # Game Title
+        title = fontBig.render('Counter Core', True, (255,255,255)) # Game Title
         titleRect = title.get_rect(center = (width/2, height/3.6))
         screen.blit(title, titleRect)
 
@@ -160,7 +164,7 @@ while True:
             cryofluid.set_alpha(256)
             cryofluidCooldown = False
 
-        text = font.render(str("%.2f" % temperature), True, (255, 255, 255))
+        text = font.render((str("%.2f" % temperature)+"°C"), True, (255, 255, 255))
         textRect = text.get_rect(center = (width/2, height/2.8))
         curScore = font.render(str("%.0f" % score), True, (255, 255, 255))
         curScoreRect = curScore.get_rect(center = (width/2, height/16))
@@ -177,6 +181,8 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if not started:
+                play_track('theFacility', -1, 0)
             started = True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
             temperature = 100304103
@@ -191,9 +197,13 @@ while True:
 # MELTDOWN EVENT
 if ending == "meltdown":
     tick = 0
+    pygame.mixer.music.stop()
     largeExplosion.play()
     while True:
         tick += 1
+
+        if tick == 300:
+            play_track('gameOver', 0, 0)
         if 0 <= tick <= 1:
             screen.fill((255,255,255))
         elif 1 < tick < 5:
@@ -210,13 +220,34 @@ if ending == "meltdown":
         elif tick == 100:
             endBoom.play()
             
-        elif tick >= 100:
-            gameOver = fontBig.render("GAME OVER", True, (255,255,255))
+        elif 100 <= tick <= 200:
+            screen.fill((0,0,0))
+            gameOver = fontBig.render("GAME OVER", True, (255,0,0))
             gameOverRect = gameOver.get_rect(center = (width/2,height/2.8))
             screen.blit(gameOver,gameOverRect)
             finalScore = font.render("Your score: "+ str("%.0f" % score), True,(255,255,255))
             finalScoreRect = finalScore.get_rect(center = (width/2,height/1.8))
             screen.blit(finalScore,finalScoreRect)
+
+        elif 300 <= tick:
+            screen.fill((0,0,0))
+            if 300 <= tick < 433:
+                text = fontMindustry.render("Counter Core", True, (255,255,255))
+                textRect = text.get_rect(center = (width/2,height/2))
+            if 433 <= tick < 566:
+                text = fontMindustry.render("A Short Game by Alexander and Chrono", True, (255,255,255))
+                textRect = text.get_rect(center = (width/2,height/2))
+            if 566 <= tick < 700:
+                text = fontMindustry.render("Music 'The Facility' by Alexander", True, (255,255,255))
+                textRect = text.get_rect(center = (width/2,height/2))
+            if 700 <= tick < 833:
+                text = fontMindustry.render("Music 'Game Over' by Alexander", True, (255,255,255))
+                textRect = text.get_rect(center = (width/2,height/2))
+            if tick >= 833:
+                text = fontMindustry.render('Thanks for Playing!', True, (255,255,255))
+                textRect = text.get_rect(center = (width/2,height/2))
+            
+            screen.blit(text, textRect)
 
 
         for event in pygame.event.get():
