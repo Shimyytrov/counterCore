@@ -10,6 +10,8 @@ screenInfo = pygame.display.Info() # get screen info
 width, height = screenInfo.current_w, screenInfo.current_h    # get screen (width, height)
 screen = pygame.display.set_mode((width, height))   # full screen
 # load fonts
+tutorialfont = pygame.font.Font('./assets/fonts/courier.ttf', 36)
+screenfont = pygame.font.Font('./assets/fonts/mindustry.ttf', 48)
 font = pygame.font.Font('./assets/fonts/courier.ttf', 48)
 fontBig = pygame.font.Font('./assets/fonts/mindustry.ttf', 72)
 fontMindustry = pygame.font.Font('./assets/fonts/mindustry.ttf', 36)
@@ -17,20 +19,20 @@ event = pygame.event.get()
  
 # load sprites
 core = pygame.image.load('./assets/sprites/core.png').convert_alpha()
-core = pygame.transform.scale(core, (width/7.5, width/7.5)) # Display as (256, 256) in a 1920x1080 screen
-coreRect = core.get_rect(center = (width/2, height/2))
+core = pygame.transform.scale(core, (width/9.96, width/9.96)) # Display as (256, 256) in a 1920x1080 screen
+coreRect = core.get_rect(center = (width/2, height/1.64))
 coreStage1 = pygame.image.load('./assets/sprites/coreDeepRed.png').convert_alpha()
-coreStage1 = pygame.transform.scale(coreStage1, (width/7.5, width/7.5)) # Display as (256, 256) in a 1920x1080 screen
-coreStage1Rect = coreStage1.get_rect(center = (width/2, height/2))
+coreStage1 = pygame.transform.scale(coreStage1, (width/9.96, width/9.96)) # Display as (256, 256) in a 1920x1080 screen
+coreStage1Rect = coreStage1.get_rect(center = (width/2, height/1.64))
 coreStage2 = pygame.image.load('./assets/sprites/coreRed.png').convert_alpha()
-coreStage2 = pygame.transform.scale(coreStage2, (width/7.5, width/7.5)) # Display as (256, 256) in a 1920x1080 screen
-coreStage2Rect = coreStage2.get_rect(center = (width/2, height/2))
+coreStage2 = pygame.transform.scale(coreStage2, (width/9.96, width/9.96)) # Display as (256, 256) in a 1920x1080 screen
+coreStage2Rect = coreStage2.get_rect(center = (width/2, height/1.64))
 coreStage3 = pygame.image.load('./assets/sprites/coreBrightRed.png').convert_alpha()
-coreStage3 = pygame.transform.scale(coreStage3, (width/7.5, width/7.5)) # Display as (256, 256) in a 1920x1080 screen
-coreStage3Rect = coreStage3.get_rect(center = (width/2, height/2))
+coreStage3 = pygame.transform.scale(coreStage3, (width/9.96, width/9.96)) # Display as (256, 256) in a 1920x1080 screen
+coreStage3Rect = coreStage3.get_rect(center = (width/2, height/1.64))
 coreStage4 = pygame.image.load('./assets/sprites/coreXtremeRed.png').convert_alpha()
-coreStage4 = pygame.transform.scale(coreStage4, (width/7.5, width/7.5)) # Display as (256, 256) in a 1920x1080 screen
-coreStage4Rect = coreStage4.get_rect(center = (width/2, height/2))
+coreStage4 = pygame.transform.scale(coreStage4, (width/9.96, width/9.96)) # Display as (256, 256) in a 1920x1080 screen
+coreStage4Rect = coreStage4.get_rect(center = (width/2, height/1.64))
 waterBucket = pygame.image.load('./assets/sprites/waterBucket.png').convert_alpha()
 waterBucket = pygame.transform.scale(waterBucket, (width/10, width/10)) # Display as (192, 192) in a 1920x1080 screen
 waterBucketRect = waterBucket.get_rect(center = (width-width/16, height/8))
@@ -43,6 +45,12 @@ graphRodRect = graphRod.get_rect(center = (width-width/16, (height/8)*5))
 glassCover = pygame.image.load('./assets/sprites/glassCover.png').convert_alpha()
 glassCover = pygame.transform.scale(glassCover, (width, height))
 glassCoverRect = glassCover.get_rect(center = (width/2, height/2))
+background = pygame.image.load('./assets/sprites/room.png').convert_alpha()
+background = pygame.transform.scale(background, (width/1.5, height/1.5))
+backgroundRect = background.get_rect(center = (width/2, height/2))
+backgroundRed = pygame.image.load('./assets/sprites/roomRed.png').convert_alpha()
+backgroundRed = pygame.transform.scale(backgroundRed, (width/1.5, height/1.5))
+backgroundRedRect = backgroundRed.get_rect(center = (width/2, height/2))
 
 #load sounds
 largeExplosion = pygame.mixer.Sound('./assets/sounds/meltdown.wav')
@@ -56,8 +64,9 @@ mouse_pos = (0, 0)
 tick = 0
 temperature = 0.00
 speed = 0
-powerLevel = 1
+powerLevel = 0
 started = False
+itemTutorial = False
 score = 0
 ending = None
 
@@ -98,31 +107,64 @@ while True:
     coreStage2.set_alpha((temperature-1024)/4)
     coreStage3.set_alpha((temperature-2048)/4)
     coreStage4.set_alpha((temperature-3072)/4)
-    
-    
-    screen.blit(core, coreRect)
-    screen.blit(coreStage1, coreStage1Rect)
-    screen.blit(coreStage2, coreStage2Rect)
-    screen.blit(coreStage3, coreStage3Rect)
-    screen.blit(coreStage4, coreStage4Rect)
+    backgroundRed.set_alpha((temperature-2048)/8)
     
     if not started:
+        screen.blit(core, coreRect)
         msgStart = font.render('Press Space to Start', True, (255,255,255)) # Press to Start
         msgStartRect = msgStart.get_rect(center = (width/2, height/1.3))
         screen.blit(msgStart, msgStartRect)
-        title = fontBig.render('Counter Core', True, (255,255,255)) # Game Title
+        title = fontBig.render('Melting Core', True, (255,255,255)) # Game Title
         titleRect = title.get_rect(center = (width/2, height/3.6))
         screen.blit(title, titleRect)
 
+    if itemTutorial:
+        screen.fill((16,16,16))
+        screen.blit(waterBucket,waterBucketRect)
+        screen.blit(cryofluid,cryofluidRect)
+        screen.blit(graphRod, graphRodRect)
+        waterBucketText = tutorialfont.render("Temperature -25°C, Reaction Level +1.5, Cooldown: 20s", True, (255,255,255))
+        cryofluidText = tutorialfont.render("Temperature -75°C, Reaction Level +3.5, Cooldown: 40s", True, (255,255,255))
+        graphRodText = tutorialfont.render("Temperature +256°C, Reaction Level decrease to 0.01, Cooldown: 120s", True, (255,255,255))
+        waterBucketTextRect = waterBucketText.get_rect(center = (width/2, height/7))
+        cryofluidTextRect = cryofluidText.get_rect(center = (width/2, height/2.5))
+        graphRodTextRect = graphRodText.get_rect(center = (width/2, height/1.5))
+        screen.blit(waterBucketText,waterBucketTextRect)
+        screen.blit(cryofluidText,cryofluidTextRect)
+        screen.blit(graphRodText,graphRodTextRect)
+        realStart = font.render("Press Insert to skip the item description", True, (255,255,255))
+        realStartRect = realStart.get_rect(center = (width/2, height/1.2))
+        screen.blit(realStart,realStartRect)
+
     if started:
+        screen.blit(background,backgroundRect)
+        screen.blit(backgroundRed,backgroundRedRect)
+        screen.blit(core, coreRect)
+        screen.blit(coreStage1, coreStage1Rect)
+        screen.blit(coreStage2, coreStage2Rect)
+        screen.blit(coreStage3, coreStage3Rect)
+        screen.blit(coreStage4, coreStage4Rect)
         toolBarBoarder = pygame.draw.rect(screen, (211,211,211),(width-width/8,0, 4, height))
         screen.blit(waterBucket,waterBucketRect)
         screen.blit(cryofluid,cryofluidRect)
         screen.blit(graphRod, graphRodRect)
 
+        temper = screenfont.render((str("%.2f" % temperature)+"°C"), True, (0, 255, 0))
+        temperRect = temper.get_rect(center = (width/2, height/2.4))
+        pLvlTxt = screenfont.render("Reaction Level: "+str("%.2f" % powerLevel), True, (0, 255, 0))
+        pLvlTxtRect = pLvlTxt.get_rect(center = (width/2, height/3.0))
+        curScore = font.render(str("%.0f" % score), True, (255, 255, 255))
+        curScoreRect = curScore.get_rect(center = (width/2, height/16))
+        screen.blit(temper, temperRect)
+        screen.blit(pLvlTxt, pLvlTxtRect)
+        screen.blit(curScore, curScoreRect)
+        # glassCover.set_alpha(50)
+        # screen.blit(glassCover, glassCoverRect)
+
         if waterBucketRect.collidepoint(pygame.mouse.get_pos()):
             if waterBucketRect.collidepoint(mouse_pos) and not bucketCooldown:
                 temperature -= 25
+                powerLevel += 1.5
                 mouse_pos = (0, 0)
                 bucketCooldown = True
                 bucketCooldownEnd = tick + 50*20
@@ -130,6 +172,7 @@ while True:
         if cryofluidRect.collidepoint(pygame.mouse.get_pos()):
             if cryofluidRect.collidepoint(mouse_pos) and not cryofluidCooldown:
                 temperature -= 75
+                powerLevel += 3.5
                 mouse_pos = (0, 0)
                 cryofluidCooldown = True
                 cryofluidCooldownEnd = tick + 50*40
@@ -145,9 +188,11 @@ while True:
             if tick < 200 and tick % 4 == 0:
                 print(powerLevel)
                 powerLevel = powerLevel * 0.750
-            if tick == 200:
+            if tick == 400:
                 print(powerLevel)
                 rodUsing = False
+                powerLevel = 0.01
+                temperature += 256
             
 
         tick += 1
@@ -194,15 +239,6 @@ while True:
             graphRod.set_alpha(256)
             rodCooldown = False
 
-        text = font.render((str("%.2f" % temperature)+"°C"), True, (255, 255, 255))
-        textRect = text.get_rect(center = (width/2, height/2.8))
-        curScore = font.render(str("%.0f" % score), True, (255, 255, 255))
-        curScoreRect = curScore.get_rect(center = (width/2, height/16))
-        screen.blit(text, textRect)
-        screen.blit(curScore, curScoreRect)
-        glassCover.set_alpha(50)
-        screen.blit(glassCover, glassCoverRect)
-
     if temperature >= 5120:
         ending = "meltdown"
         break
@@ -213,8 +249,11 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            itemTutorial = True
+        if event.type == pygame.KEYDOWN and event.key  == pygame.K_INSERT:
             if not started:
                 play_track('theFacility', -1, 0)
+            itemTutorial = False
             started = True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
             temperature = 100304103
